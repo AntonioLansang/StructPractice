@@ -1,0 +1,288 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+// good structure to use
+struct stock
+{
+        char name[25];
+        int quantity;
+        float price;
+};
+
+
+int getStock( char fname[], struct stock items[] )
+{
+        FILE *stuff;
+        int n=0;
+
+        stuff=fopen(fname ,"r");
+        fscanf(stuff, "%s %d %f",  items[0].name, &items[0].quantity, &items[0].price);
+        while( !feof(stuff))
+        {
+                n++;
+                fscanf(stuff,"%s %d %f", items[n].name, &items[n].quantity, &items[n].price);
+
+
+        }
+        return n;
+}
+
+
+void showInventory( struct stock inventory[], int N  )
+{
+        int i;
+        int choice;
+
+    for (i = 0; i < N; ++i)
+        printf("%2d -- %10s  %3d  %6.2f\n", i+1, inventory[i].name,
+                  inventory[i].quantity, inventory[i].price );
+}
+void buySomething(struct stock items[], int N  )
+{
+        int pick;
+        // print the list to show choices
+        showInventory( items, N );
+
+        // ask which item
+        printf("Which item(1-%d): ", N);
+        scanf("%d", &pick);
+
+        while(pick>0)
+        {
+
+                printf("Getting item %d\n", pick);
+                pick--;
+
+                // decrease quantity
+
+                items[pick].quantity -= 1;
+                // print new quantity
+                printf("Now have %d of %s in stock \n", items[pick].quantity, items[pick].name);
+
+                showInventory(items, N);
+                 printf("Which item(1-%d): ", N);
+                scanf("%d", &pick);
+
+
+
+        }
+}
+
+void AddSomething(struct stock items[], int N  )
+{
+        int pick;
+        // print the list to show choices
+        showInventory( items, N );
+
+        // ask which item
+        printf("Which item(1-%d): ", N);
+        scanf("%d", &pick);
+
+        while(pick>0)
+        {
+
+                printf("Getting item %d\n", pick);
+                pick--;
+
+                // increase quantity
+
+                items[pick].quantity += 1;
+                // print new quantity
+                printf("Now have %d of %s in stock \n", items[pick].quantity, items[pick].name);
+
+                showInventory(items, N);
+                 printf("Which item(1-%d): ", N);
+                scanf("%d", &pick);
+
+
+
+        }
+}
+
+void LowestInventory(struct stock items[],int N)
+{
+        int k,s;
+        int mark=0;
+        s=items[0].quantity;
+        for(k=0;k<N;k++)
+                {
+
+                        if(items[k].quantity<s)
+                                {s=items[k].quantity;
+                                mark=k;
+                                }
+                }
+        printf("%s has the lowest at %d units\n", items[mark].name, s);
+}
+
+void BiggestInventory(struct stock items[],int N)
+{
+    int k,s;
+        int mark=0;
+    s=items[0].quantity;
+    for(k=0;k<N;k++)
+        {
+
+            if(items[k].quantity>s)
+               { s=items[k].quantity;
+                        mark=k;
+                                }
+                }
+    printf("%s has the biggest with  %d units\n", items[mark].name, s);
+}
+
+void LowestValue(struct stock items[], int N)
+{
+        int k;
+        int mark;
+        float s;
+        s=items[0].quantity*items[0].price;
+        mark=0;
+        for(k=0;k<N;k++)
+        {
+                if(items[k].quantity*items[k].price<s)
+                        {
+                        s=items[k].quantity*items[k].price;
+                        mark=k;
+                        }
+        }
+printf("%s has the lowest value with $%.2f\n",items[mark].name,s);
+
+}
+
+void BiggestValue(struct stock items[], int N)
+{
+    int k;
+    int mark=0;
+    float s;
+    s=items[0].quantity*items[0].price;
+    for(k=0;k<N;k++)
+    {
+        if(items[k].quantity*items[k].price>s)
+            {
+            s=items[k].quantity*items[k].price;
+            mark=k;
+            }
+    }
+printf("%s has the biggest value with $%.2f\n",items[mark].name,s);
+
+}
+
+void Reorder(struct stock items[], int N, int minimum)
+{
+        int k;
+        for(k=0;k<N;k++)
+        {
+                if(items[k].quantity<minimum)
+                        printf("%s needs reordering\n ", items[k].name);
+        }
+
+
+}
+
+int main(int argc, char *argv[])
+{
+
+        int n;
+        struct stock Inventory[100];
+        int N;
+        int choice;
+        int min;
+
+        // initial inventory file name supplied on command line
+        // if no argument is supplied, you a file named  "products"
+        // if a file is not able to be read, program should handle it
+        // read in the data to get things started
+
+
+        if(argc==2)
+        {
+                n=getStock(argv[1], Inventory);
+        }
+        else if (argc==1)
+        {
+                n=getStock("products",Inventory);
+        }
+        else {
+                printf("no file can be read");
+        }
+        showInventory(Inventory, n);
+
+        printf("How many do you want for a minimum?");
+        scanf("%d", &min);
+
+        // menu of options
+        // each should call a function ; most work should happen in function
+        // you can do some simple input or loop in main menu is needed
+        do
+        {
+                printf("------ Menu ------------\n");
+                // print out the nicely formatted list
+                printf("1) Show Inventory\n");
+                // ask for product number and buy one
+                printf("2) Buy something \n");
+                // ask for product number and quantity to add
+                printf("3) Stock something\n");
+                // what item has lowest number of items
+                printf("4) Lowest inventory\n");
+                // what item has highest number of items
+                printf("5) Highest inventory\n");
+                // lowest total value for a product inventory
+                printf("6) Lowest total stocking value\n");
+                // highest total value for a product inventory
+                printf("7) Highest total stocking value\n");
+                // list all products under a certain threshold (input)
+                printf("8) Generate re-order list\n");
+                // import a new inventory file
+                printf("9) Load new inventory file\n");
+                // change all product names to lowercase ( call function used in 11)
+                printf("10) Lowercase all product names\n");
+                // must pass a single structure to a function, not the full array
+                printf("11) Lowercase a specific product name\n");
+                printf("0) Quit\n");
+
+                // make sure the choice is a valid integer
+                // before you go to the switch
+
+                // do the requested task
+                scanf("%d", &choice);
+                switch (choice)
+                {
+                case 1:
+                        showInventory( Inventory, n );
+                        break;
+                case 2:
+                        buySomething(Inventory, n);
+                        //buySomething
+                        break;
+                case 3:
+                        AddSomething(Inventory, n);
+                        break;
+                case 4:
+                        LowestInventory(Inventory,n);
+                        break;
+                case 5:
+                        BiggestInventory(Inventory, n);
+                        break;
+                case 6:
+                        LowestValue(Inventory,n);
+                        break;
+                case 7:
+                        BiggestValue(Inventory,n);
+                        break;
+                case 8:
+                        Reorder(Inventory,n, min);
+                        break;
+                case 9:
+                        NewInventory();
+                        break;
+
+
+                }
+
+        } while (choice > 0);
+
+        return 0;
+}
